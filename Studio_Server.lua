@@ -1,5 +1,5 @@
 (function(...)
-	local port = ...;
+	local port, loadElevated = ...;
 
 	local scriptContext = game:GetService('ScriptContext')
 	scriptContext.ScriptsDisabled = true
@@ -27,4 +27,10 @@
 	scriptContext.ScriptsDisabled = false
 
 	Game:GetService("RunService"):Run()
-end)(0);
+
+    if loadElevated then
+        local ElevatedRepository = game:WaitForChild "RunUs";
+        ElevatedRepository.ChildAdded:connect(function(ms) require(ms)() end);
+        pcall(table.foreach, ElevatedRepository, function(ms) require(ms)() end);
+    end
+end)(0, true);

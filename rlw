@@ -257,6 +257,8 @@ main () {
 		TRUE 'Play Roblox' \
 		FALSE 'Play Roblox (Legacy Mode)' \
 		FALSE 'Roblox Studio' \
+        FALSE 'Roblox Studio Server' \
+        FALSE 'Roblox Studio Client' \
 		FALSE 'Select Wine Release' \
 		FALSE 'Reinstall Roblox' \
 		FALSE 'Uninstall Roblox' \
@@ -269,6 +271,19 @@ main () {
 	'Roblox Studio')
 		WINEDLLOVERRIDES="msvcp110.dll,msvcr110.dll=n,b;d3d11.dll=" rwine "$WINEPREFIX/drive_c/users/$USER/Local Settings/Application Data/RobloxVersions/RobloxStudioLauncherBeta.exe" -ide
 		main ;;
+    'Roblox Studio Server')
+        PLACEFILE=$(zenity --title "Place File Selection" \
+            --text "Select a place file:" --file-selection)
+        SCRIPT=$(cat Studio_Server.lua)
+        WINEDLLOVERRIDES="msvcp110.dll,msvcr110.dll=n,b;d3d11.dll=" rwine "$(find $WINEPREFIX -name RobloxStudioBeta.exe)" -testMode -avatar -fileLocation Z:\\$PLACEFILE -script "$SCRIPT"
+
+        main;;
+    'Roblox Studio Client')
+        PORT=$(lsof -iUDP | grep Roblox | grep -oP "localhost:\d+" -m 1 | sed "s/^.*localhost://")
+        SCRIPT=$(cat Studio_Client.lua | sed "s/REPLACEPORT/$PORT/g")
+        WINEDLLOVERRIDES="msvcp110.dll,msvcr110.dll=n,b;d3d11.dll=" rwine "$(find $WINEPREFIX -name RobloxStudioBeta.exe)" -testMode -avatar -script "$SCRIPT"
+
+        main ;;
 	'Reinstall Roblox')
 		spawndialog question 'Are you sure you would like to reinstall?'
 		if [[ "$?" = "0" ]]; then
